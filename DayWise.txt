@@ -1,0 +1,82 @@
+09-04-26
+
+1. List all the columns of the Salespeople table.
+
+mysql> select * from salespeople;
++------+---------+-----------+------+
+| SNUM | SNAME   | CITY      | COMM |
++------+---------+-----------+------+
+| 1001 | Peel    | London    |    0 |
+| 1002 | Serres  | San Jose  |    0 |
+| 1003 | AxelRod | New York  |    0 |
+| 1004 | Motika  | London    |    0 |
+| 1005 | Fran    | London    |    0 |
+| 1007 | Rifkin  | Barcelona |    0 |
++------+---------+-----------+------+
+
+
+2. List all customers with a rating of 100.
+
+mysql> select * from customers where rating=100;
++------+---------+--------+--------+------+
+| CNUM | CNAME   | CITY   | RATING | SNUM |
++------+---------+--------+--------+------+
+| 2001 | Hoffman | London |    100 | 1001 |
+| 2006 | Clemens | London |    100 | 1001 |
+| 2007 | Pereira | Rome   |    100 | 1004 |
++------+---------+--------+--------+------+
+
+
+3. Find all records in the Customer table with NULL values in the city column.
+
+mysql> select * from customers where city is null;
+Empty set (0.00 sec)
+
+added a null value to check
+
+mysql> insert into customers value(2008, 'Andy', null, 200, 1004);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from customers where city is null;
++------+-------+------+--------+------+
+| CNUM | CNAME | CITY | RATING | SNUM |
++------+-------+------+--------+------+
+| 2008 | Andy  | NULL |    200 | 1004 |
++------+-------+------+--------+------+
+
+4. Find the largest order taken by each salesperson on each date.
+
+mysql> select SNUM, ODATE, MAX(AMT) as largest_num FROM orders group by snum, odate;
++------+------------+-------------+
+| SNUM | ODATE      | largest_num |
++------+------------+-------------+
+| 1007 | 1996-03-10 |     1098.16 |
+| 1004 | 1996-03-10 |     1900.10 |
+| 1001 | 1996-03-10 |      767.19 |
+| 1002 | 1996-03-10 |     5160.45 |
+| 1003 | 1996-04-10 |     1713.23 |
+| 1001 | 1996-05-10 |     4723.00 |
+| 1002 | 1996-06-10 |     1309.95 |
+| 1001 | 1996-06-10 |     9891.88 |
++------+------------+-------------+
+
+
+
+5. Arrange the Orders table by descending customer number.
+
+mysql> select * from orders order by cnum desc;
+
++------+---------+------------+------+------+
+| ONUM | AMT     | ODATE      | CNUM | SNUM |
++------+---------+------------+------+------+
+| 3001 |   18.69 | 1996-03-10 | 2008 | 1007 |
+| 3006 | 1098.16 | 1996-03-10 | 2008 | 1007 |
+| 3002 | 1900.10 | 1996-03-10 | 2007 | 1004 |
+| 3008 | 4723.00 | 1996-05-10 | 2006 | 1001 |
+| 3011 | 9891.88 | 1996-06-10 | 2006 | 1001 |
+| 3010 | 1309.95 | 1996-06-10 | 2004 | 1002 |
+| 3005 | 5160.45 | 1996-03-10 | 2003 | 1002 |
+| 3007 |   75.75 | 1996-04-10 | 2002 | 1003 |
+| 3009 | 1713.23 | 1996-04-10 | 2002 | 1003 |
+| 3003 |  767.19 | 1996-03-10 | 2001 | 1001 |
++------+---------+------------+------+------+
