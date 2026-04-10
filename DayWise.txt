@@ -61,6 +61,23 @@ mysql> select SNUM, ODATE, MAX(AMT) as largest_num FROM orders group by snum, od
 +------+------------+-------------+
 
 
+mysql> SELECT s.sname, o.odate, MAX(o.amt) AS max_amt
+    -> FROM salespeople s
+    -> JOIN orders o ON s.snum = o.snum
+    -> GROUP BY s.sname, o.odate;
++---------+------------+---------+
+| sname   | odate      | max_amt |
++---------+------------+---------+
+| Rifkin  | 1996-03-10 | 1098.16 |
+| Motika  | 1996-03-10 | 1900.10 |
+| Peel    | 1996-03-10 |  767.19 |
+| Serres  | 1996-03-10 | 5160.45 |
+| AxelRod | 1996-04-10 | 1713.23 |
+| Peel    | 1996-05-10 | 4723.00 |
+| Serres  | 1996-06-10 | 1309.95 |
+| Peel    | 1996-06-10 | 9891.88 |
++---------+------------+---------+
+
 
 5. Arrange the Orders table by descending customer number.
 
@@ -80,3 +97,115 @@ mysql> select * from orders order by cnum desc;
 | 3009 | 1713.23 | 1996-04-10 | 2002 | 1003 |
 | 3003 |  767.19 | 1996-03-10 | 2001 | 1001 |
 +------+---------+------------+------+------+
+
+
+10-04-26
+
+
+6. Find which salespeople currently have orders in the Orders table.
+
+select s.snum, s.sname from salespeople s join orders o 
+on  s.snum=o.snum; 
+
+mysql> select s.snum, s.sname from salespeople s join orders o
+    -> on  s.snum=o.snum;
++------+---------+
+| snum | sname   |
++------+---------+
+| 1001 | Peel    |
+| 1001 | Peel    |
+| 1001 | Peel    |
+| 1002 | Serres  |
+| 1002 | Serres  |
+| 1003 | AxelRod |
+| 1003 | AxelRod |
+| 1004 | Motika  |
+| 1007 | Rifkin  |
+| 1007 | Rifkin  |
++------+---------+
+10 rows in set (0.43 sec)
+
+
+7. List names of all customers matched with the salespeople serving them.
+
+select c.cname as customer_name, s.sname as salesperson_name
+from customers c
+join salespeople s
+on c.snum=s.snum;
+
+mysql> select c.cname as customer_name, s.sname as salesperson_name
+    -> from customers c
+    -> join salespeople s
+    -> on c.snum=s.snum;
++---------------+------------------+
+| customer_name | salesperson_name |
++---------------+------------------+
+| Hoffman       | Peel             |
+| Giovanni      | AxelRod          |
+| Liu           | Serres           |
+| Grass         | Serres           |
+| Clemens       | Peel             |
+| Pereira       | Motika           |
+| Cisneros      | Rifkin           |
+| Andy          | Motika           |
++---------------+------------------+
+
+8. Find the names and numbers of all salespeople who had more than one customer.
+
+select s.sname, s.snum 
+from salespeople s 
+join customers c on s.snum=c.snum
+group by s.snum, s.sname
+having count(c.cnum)>1;
+
+9. Count the orders of each of the salespeople and output the results in descending order.
+
+select s.sname,s.snum, count(o.onum) as order_count
+from salespeople s 
+left join orders o on s.snum=o.snum
+group by s.snum, s.sname
+order by order_count desc;
+
+mysql> select s.sname,s.snum, count(o.onum) as order_count
+    -> from salespeople s
+    -> left join orders o on s.snum=o.snum
+    -> group by s.snum, s.sname
+    -> order by order_count desc;
++---------+------+-------------+
+| sname   | snum | order_count |
++---------+------+-------------+
+| Peel    | 1001 |           3 |
+| Serres  | 1002 |           2 |
+| AxelRod | 1003 |           2 |
+| Rifkin  | 1007 |           2 |
+| Motika  | 1004 |           1 |
+| Fran    | 1005 |           0 |
++---------+------+-------------+
+
+
+10. List the Customer table if and only if one or more of the customers in the Customer table are
+located in San Jose.
+
+
+select * from customers 
+where exists (
+select 1 from customers where city='San Jose'
+);
+
+mysql> select * from customers
+    -> where exists (
+    -> select 1 from customers where city='San Jose'
+    -> );
++------+----------+----------+--------+------+
+| CNUM | CNAME    | CITY     | RATING | SNUM |
++------+----------+----------+--------+------+
+| 2001 | Hoffman  | London   |    100 | 1001 |
+| 2002 | Giovanni | Rome     |    200 | 1003 |
+| 2003 | Liu      | San Jose |    200 | 1002 |
+| 2004 | Grass    | Berlin   |    300 | 1002 |
+| 2006 | Clemens  | London   |    100 | 1001 |
+| 2007 | Pereira  | Rome     |    100 | 1004 |
+| 2008 | Cisneros | San Jose |    300 | 1007 |
+| 2010 | Andy     | NULL     |    200 | 1004 |
++------+----------+----------+--------+------+
+8 rows in set (0.05 sec)
