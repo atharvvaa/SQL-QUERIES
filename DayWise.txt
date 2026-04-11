@@ -209,3 +209,90 @@ mysql> select * from customers
 | 2010 | Andy     | NULL     |    200 | 1004 |
 +------+----------+----------+--------+------+
 8 rows in set (0.05 sec)
+
+
+11-04-26
+
+11. Match salespeople to customers according to what city they lived in.
+
+select s.sname,c.cname,s.city,c.city 
+from salespeople s 
+join customers c
+on s.city=c.city; 
+
+mysql> select s.sname,c.cname,s.city,c.city
+    -> from salespeople s
+    -> join customers c
+    -> on s.city=c.city;
++--------+----------+----------+----------+
+| sname  | cname    | city     | city     |
++--------+----------+----------+----------+
+| Fran   | Hoffman  | London   | London   |
+| Motika | Hoffman  | London   | London   |
+| Peel   | Hoffman  | London   | London   |
+| Serres | Liu      | San Jose | San Jose |
+| Fran   | Clemens  | London   | London   |
+| Motika | Clemens  | London   | London   |
+| Peel   | Clemens  | London   | London   |
+| Serres | Cisneros | San Jose | San Jose |
++--------+----------+----------+----------+
+8 rows in set (0.01 sec)
+
+12. Find the largest order taken by each salesperson.
+
+select snum,max(amt) as largest_order from orders
+group by snum;
+
+mysql> select snum,max(amt) as largest_order from orders
+    -> group by snum;
++------+---------------+
+| snum | largest_order |
++------+---------------+
+| 1001 |       9891.88 |
+| 1002 |       5160.45 |
+| 1003 |       1713.23 |
+| 1004 |       1900.10 |
+| 1007 |       1098.16 |
++------+---------------+
+5 rows in set (0.01 sec)
+
+13. Find customers in San Jose who have a rating above 200.
+
+mysql> select * from customers where city = 'San Jose' and rating >200;
++------+----------+----------+--------+------+
+| CNUM | CNAME    | CITY     | RATING | SNUM |
++------+----------+----------+--------+------+
+| 2008 | Cisneros | San Jose |    300 | 1007 |
++------+----------+----------+--------+------+
+
+
+14. List the names and commissions of all salespeople in London.
+
+select sname,comm from salespeople where city='london';
+
+mysql> select sname,comm from salespeople where city='london';
++--------+------+
+| sname  | comm |
++--------+------+
+| Peel   | 0.12 |
+| Motika | 0.15 |
+| Fran   | 0.10 |
++--------+------+
+
+15. List all the orders of salesperson Motika from the Orders table.
+
+select onum from orders o 
+join salespeople s 
+on 
+
+select onum from orders 
+where snum =(select snum from salespeople  where sname='Motika');
+
+mysql> select onum from orders
+    -> where snum =(select snum from salespeople  where sname='Motika');
++------+
+| onum |
++------+
+| 3002 |
++------+
+
