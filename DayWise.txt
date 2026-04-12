@@ -296,3 +296,106 @@ mysql> select onum from orders
 | 3002 |
 +------+
 
+12-04-26
+
+16. Find all customers with orders on October 3.
+
+select c.cname, o.odate from customers c
+join orders o 
+on c.cnum=o.cnum
+where odate='1996-03-10';
+
+mysql> select c.cname, o.odate from customers c
+    -> join orders o
+    -> on c.cnum=o.cnum
+    -> where odate='1996-03-10';
++----------+------------+
+| cname    | odate      |
++----------+------------+
+| Cisneros | 1996-03-10 |
+| Pereira  | 1996-03-10 |
+| Hoffman  | 1996-03-10 |
+| Liu      | 1996-03-10 |
+| Cisneros | 1996-03-10 |
++----------+------------+
+5 rows in set (0.01 sec)
+
+17. Give the sums of the amounts from the Orders table, grouped by date, eliminating all those
+dates where the SUM was not at least 2000.00 above the MAX amount.
+
+select odate,sum(amt) as total_sum from orders 
+group by odate
+having sum(amt)> max(amt)+2000;
+
+mysql> select odate,sum(amt) as total_sum from orders
+    -> group by odate
+    -> having sum(amt)> max(amt)+2000;
++------------+-----------+
+| odate      | total_sum |
++------------+-----------+
+| 1996-03-10 |   8944.59 |
++------------+-----------+
+
+
+18. Select all orders that had amounts that were greater than at least one of the orders from
+October 6.
+
+select * from orders 
+where amt>any(
+select amt from orders 
+where odate='1996-10-06');
+
+mysql> select * from orders
+    -> where amt>any(
+    -> select amt from orders
+    -> where odate='1996-10-06');
+Empty set (0.05 sec)
+
+
+19. Write a query that uses the EXISTS operator to extract all salespeople who have customers
+with a rating of 300.
+
+select * from salespeople s 
+where exists (
+select 1
+from customers c
+where c.snum=s.snum
+and c.rating=300);
+
+mysql> select * from salespeople s
+    -> where exists (
+    -> select 1
+    -> from customers c
+    -> where c.snum=s.snum
+    -> and c.rating=300);
++------+--------+-----------+------+
+| SNUM | SNAME  | CITY      | COMM |
++------+--------+-----------+------+
+| 1002 | Serres | San Jose  | 0.13 |
+| 1007 | Rifkin | Barcelona | 0.26 |
++------+--------+-----------+------+ 
+
+20. Find all pairs of customers having the same rating.
+
+select c1.cnum as customer1, c2.cnum as customer2, c1.rating
+from customers c1 join customers c2
+on c1.rating=c2.rating
+and c1.cnum<c2.cnum;
+
+mysql> select c1.cnum as customer1, c2.cnum as customer2, c1.rating
+    -> from customers c1 join customers c2
+    -> on c1.rating=c2.rating
+    -> and c1.cnum<c2.cnum;
++-----------+-----------+--------+
+| customer1 | customer2 | rating |
++-----------+-----------+--------+
+|      2001 |      2006 |    100 |
+|      2001 |      2007 |    100 |
+|      2002 |      2003 |    200 |
+|      2002 |      2010 |    200 |
+|      2003 |      2010 |    200 |
+|      2004 |      2008 |    300 |
+|      2006 |      2007 |    100 |
++-----------+-----------+--------+
+7 rows in set (0.01 sec)
+
