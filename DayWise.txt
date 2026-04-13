@@ -399,3 +399,124 @@ mysql> select c1.cnum as customer1, c2.cnum as customer2, c1.rating
 +-----------+-----------+--------+
 7 rows in set (0.01 sec)
 
+
+13-04-26
+
+21. Find all customers whose CNUM is 1000 above the SNUM of Serres.
+
+select * from customers
+where cnum =(select snum from salespeople 
+where sname='Serres')+1000;
+
+mysql> select * from customers
+    -> where cnum =(select snum from salespeople
+    -> where sname='Serres')+1000;
++------+----------+------+--------+------+
+| CNUM | CNAME    | CITY | RATING | SNUM |
++------+----------+------+--------+------+
+| 2002 | Giovanni | Rome |    200 | 1003 |
++------+----------+------+--------+------+
+1 row in set (0.24 sec)
+
+22. Give the salespeople’s commissions as percentages instead of decimal numbers.
+
+select comm*100 as comm_percent from salespeople;  
+
+mysql> select comm*100 as comm_percent from salespeople;
++--------------+
+| comm_percent |
++--------------+
+|        12.00 |
+|        13.00 |
+|        11.00 |
+|        15.00 |
+|        10.00 |
+|        26.00 |
++--------------+
+6 rows in set (0.01 sec)
+
+23. Find the largest order taken by each salesperson on each date, eliminating those MAX orders which are less than $3000.00 in value.
+
+select snum,odate,max(amt) as max_order
+from orders 
+group by snum, odate
+having max(amt)>=3000;
+
+mysql> select snum,odate,max(amt) as max_order
+    -> from orders
+    -> group by snum, odate
+    -> having max(amt)>=3000;
++------+------------+-----------+
+| snum | odate      | max_order |
++------+------------+-----------+
+| 1002 | 1996-03-10 |   5160.45 |
+| 1001 | 1996-05-10 |   4723.00 |
+| 1001 | 1996-06-10 |   9891.88 |
++------+------------+-----------+
+3 rows in set (0.02 sec)
+
+24. List the largest orders for October 3, for each salesperson.
+
+select max(amt),snum 
+from orders 
+where odate='1996-03-10'
+group by snum;
+
+mysql> select max(amt),snum
+    -> from orders
+    -> where odate='1996-03-10'
+    -> group by snum;
++----------+------+
+| max(amt) | snum |
++----------+------+
+|   767.19 | 1001 |
+|  5160.45 | 1002 |
+|  1900.10 | 1004 |
+|  1098.16 | 1007 |
++----------+------+
+4 rows in set (0.08 sec)
+
+
+select max(amt),snum,odate 
+from orders 
+where odate='1996-03-10'
+group by snum;
+
+mysql> select max(amt),snum,odate
+    -> from orders
+    -> where odate='1996-03-10'
+    -> group by snum;
++----------+------+------------+
+| max(amt) | snum | odate      |
++----------+------+------------+
+|   767.19 | 1001 | 1996-03-10 |
+|  5160.45 | 1002 | 1996-03-10 |
+|  1900.10 | 1004 | 1996-03-10 |
+|  1098.16 | 1007 | 1996-03-10 |
++----------+------+------------+
+4 rows in set (0.00 sec)
+
+25. Find all customers located in cities where Serres (SNUM 1002) has customers.
+
+select * from customers 
+where city in (
+select city 
+from customers
+where snum=1002);
+
+mysql> select * from customers
+    -> where city in (
+    -> select city
+    -> from customers
+    -> where snum=1002);
++------+----------+----------+--------+------+
+| CNUM | CNAME    | CITY     | RATING | SNUM |
++------+----------+----------+--------+------+
+| 2003 | Liu      | San Jose |    200 | 1002 |
+| 2004 | Grass    | Berlin   |    300 | 1002 |
+| 2008 | Cisneros | San Jose |    300 | 1007 |
++------+----------+----------+--------+------+
+3 rows in set (0.00 sec)
+
+
+
