@@ -519,4 +519,122 @@ mysql> select * from customers
 3 rows in set (0.00 sec)
 
 
+14-04-26
+
+
+26. Select all customers with a rating above 200.00.
+
+select * from customers where rating>200;
+
+mysql> select * from customers where rating>200;
++------+----------+----------+--------+------+
+| CNUM | CNAME    | CITY     | RATING | SNUM |
++------+----------+----------+--------+------+
+| 2004 | Grass    | Berlin   |    300 | 1002 |
+| 2008 | Cisneros | San Jose |    300 | 1007 |
++------+----------+----------+--------+------+
+2 rows in set (0.01 sec)
+
+
+27. Count the number of salespeople currently listing orders in the Orders table.
+
+select count(distinct snum) salespeople_count 
+from orders;
+
+mysql> select count(distinct snum) salespeople_count
+    -> from orders;
++-------------------+
+| salespeople_count |
++-------------------+
+|                 5 |
++-------------------+
+1 row in set (0.00 sec)
+
+28. Write a query that produces all customers serviced by salespeople with a commission above 12%. Output the customer’s name and the salesperson’s rate of commission.
+
+select c.cname,s.comm from customers c
+join salespeople s
+on c.snum=s.snum
+where s.comm>0.12;
+
+mysql> select c.cname,s.comm from customers c
+    -> join salespeople s
+    -> on c.snum=s.snum
+    -> where s.comm>0.12;
++----------+------+
+| cname    | comm |
++----------+------+
+| Liu      | 0.13 |
+| Grass    | 0.13 |
+| Pereira  | 0.15 |
+| Andy     | 0.15 |
+| Cisneros | 0.26 |
++----------+------+
+5 rows in set (0.00 sec)
+
+
+29. Find salespeople who have multiple customers.
+
+select s.snum,s.sname,count(c.cnum) as customer_count
+from salespeople s join customers c
+on s.snum=c.snum
+group by s.snum, s.sname
+having count(c.cnum) > 1;
+
+mysql> select s.snum,s.sname,count(c.cnum) as customer_count
+    -> from salespeople s join customers c
+    -> on s.snum=c.snum
+    -> group by s.snum, s.sname
+    -> having count(c.cnum) > 1;
++------+--------+----------------+
+| snum | sname  | customer_count |
++------+--------+----------------+
+| 1001 | Peel   |              2 |
+| 1002 | Serres |              2 |
+| 1004 | Motika |              2 |
++------+--------+----------------+
+3 rows in set (0.05 sec)
+
+
+30. Find salespeople with customers located in their city.
+
+
+select s.sname,s.city,c.cname,c.city
+from salespeople s join customers c 
+on s.city=c.city;
+
+mysql> select s.sname,s.city,c.cname,c.city
+    -> from salespeople s join customers c
+    -> on s.city=c.city;
++--------+----------+----------+----------+
+| sname  | city     | cname    | city     |
++--------+----------+----------+----------+
+| Fran   | London   | Hoffman  | London   |
+| Motika | London   | Hoffman  | London   |
+| Peel   | London   | Hoffman  | London   |
+| Serres | San Jose | Liu      | San Jose |
+| Fran   | London   | Clemens  | London   |
+| Motika | London   | Clemens  | London   |
+| Peel   | London   | Clemens  | London   |
+| Serres | San Jose | Cisneros | San Jose |
++--------+----------+----------+----------+
+8 rows in set (0.00 sec)
+
+
+mysql> SELECT s.sname, s.city, GROUP_CONCAT(c.cname) AS customers_in_city
+    -> FROM salespeople s
+    -> JOIN customers c
+    ->   ON s.city = c.city
+    -> GROUP BY s.snum, s.sname, s.city;
++--------+----------+-------------------+
+| sname  | city     | customers_in_city |
++--------+----------+-------------------+
+| Peel   | London   | Hoffman,Clemens   |
+| Serres | San Jose | Liu,Cisneros      |
+| Motika | London   | Hoffman,Clemens   |
+| Fran   | London   | Hoffman,Clemens   |
++--------+----------+-------------------+
+
+
+
 
