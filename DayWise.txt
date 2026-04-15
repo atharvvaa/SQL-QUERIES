@@ -636,5 +636,90 @@ mysql> SELECT s.sname, s.city, GROUP_CONCAT(c.cname) AS customers_in_city
 +--------+----------+-------------------+
 
 
+15-04-26
+
+31. Find all salespeople whose name starts with ‘P’ and the fourth character is ‘l’.
+
+select * from salespeople where sname like 'P__l%';
+
+mysql> select * from salespeople where sname like 'P__l%';
++------+-------+--------+------+
+| SNUM | SNAME | CITY   | COMM |
++------+-------+--------+------+
+| 1001 | Peel  | London | 0.12 |
++------+-------+--------+------+
+1 row in set (0.00 sec)
+
+32.Write a query that uses a subquery to obtain all orders for the customer named Cisneros. Assume you do not know his customer number.
+
+select *  from orders where cnum = ( select cnum from customers where cname='Cisneros');
+
+mysql> select *  from orders where cnum = ( select cnum from customers where cname='Cisneros');
++------+---------+------------+------+------+
+| ONUM | AMT     | ODATE      | CNUM | SNUM |
++------+---------+------------+------+------+
+| 3001 |   18.69 | 1996-03-10 | 2008 | 1007 |
+| 3006 | 1098.16 | 1996-03-10 | 2008 | 1007 |
++------+---------+------------+------+------+
+2 rows in set (0.06 sec)
+
+
+33. Find the largest orders for Serres and Rifkin.
+
+select s.sname, max(o.amt) as largest_order 
+from salespeople s
+join orders o
+on s.snum=o.snum
+where s.sname in ('serres', 'rifkin')
+group by s.sname;
+
+mysql> select s.sname, max(o.amt) as largest_order
+    -> from salespeople s
+    -> join orders o
+    -> on s.snum=o.snum
+    -> where s.sname in ('serres', 'rifkin')
+    -> group by s.sname;
++--------+---------------+
+| sname  | largest_order |
++--------+---------------+
+| Serres |       5160.45 |
+| Rifkin |       1098.16 |
++--------+---------------+
+2 rows in set (0.00 sec)
+
+
+34. Extract the Salespeople table in the following order : SNUM, SNAME, COMMISSION, CITY.
+
+select snum SNUM,sname SNAME,comm as commission, city CITY from salespeople;
+
+mysql> select snum SNUM,sname SNAME,comm as commission, city CITY from salespeople;
++------+---------+------------+-----------+
+| SNUM | SNAME   | commission | CITY      |
++------+---------+------------+-----------+
+| 1001 | Peel    |       0.12 | London    |
+| 1002 | Serres  |       0.13 | San Jose  |
+| 1003 | AxelRod |       0.11 | New York  |
+| 1004 | Motika  |       0.15 | London    |
+| 1005 | Fran    |       0.10 | London    |
+| 1007 | Rifkin  |       0.26 | Barcelona |
++------+---------+------------+-----------+
+6 rows in set (0.00 sec)
+
+35. Select all customers whose names fall in between ‘A’ and ‘G’ alphabetical range.
+
+select cname from customers where cname >= 'A' and cname < 'G';
+
+select cname from customers where cname between 'A' and 'G';
+
+mysql> select cname from customers where cname between 'A' and 'G';
++----------+
+| cname    |
++----------+
+| Clemens  |
+| Cisneros |
+| Andy     |
++----------+
+3 rows in set (0.00 sec)
+
 
 
