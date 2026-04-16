@@ -722,4 +722,128 @@ mysql> select cname from customers where cname between 'A' and 'G';
 3 rows in set (0.00 sec)
 
 
+16-04-26
+
+36. Select all the possible combinations of customers that you can assign.
+
+select c.cname,s.sname 
+from customers c, salespeople s;
+
+select c.cname as customers, s.sname as salespeople
+from customers c
+cross join salespeople s;
+
+mysql> select c.cname as customers, s.sname as salespeople
+    -> from customers c
+    -> cross join salespeople s;
++-----------+-------------+
+| customers | salespeople |
++-----------+-------------+
+| Hoffman   | Rifkin      |
+| Hoffman   | Fran        |
+| Hoffman   | Motika      |
+| Hoffman   | AxelRod     |
+| Hoffman   | Serres      |
+| Hoffman   | Peel        |
+| Giovanni  | Rifkin      |
+| Giovanni  | Fran        |
+| Giovanni  | Motika      |
+| Giovanni  | AxelRod     |
+| Giovanni  | Serres      |
+| Giovanni  | Peel        |
+| Liu       | Rifkin      |
+| Liu       | Fran        |
+| Liu       | Motika      |
+| Liu       | AxelRod     |
+| Liu       | Serres      |
+| Liu       | Peel        |
+| Grass     | Rifkin      |
+| Grass     | Fran        |
+| Grass     | Motika      |
+| Grass     | AxelRod     |
+| Grass     | Serres      |
+| Grass     | Peel        |
+| Clemens   | Rifkin      |
+| Clemens   | Fran        |
+| Clemens   | Motika      |
+| Clemens   | AxelRod     |
+| Clemens   | Serres      |
+| Clemens   | Peel        |
+| Pereira   | Rifkin      |
+| Pereira   | Fran        |
+| Pereira   | Motika      |
+| Pereira   | AxelRod     |
+| Pereira   | Serres      |
+| Pereira   | Peel        |
+| Cisneros  | Rifkin      |
+| Cisneros  | Fran        |
+| Cisneros  | Motika      |
+| Cisneros  | AxelRod     |
+| Cisneros  | Serres      |
+| Cisneros  | Peel        |
+| Andy      | Rifkin      |
+| Andy      | Fran        |
+| Andy      | Motika      |
+| Andy      | AxelRod     |
+| Andy      | Serres      |
+| Andy      | Peel        |
++-----------+-------------+
+48 rows in set (0.01 sec)
+
+
+37. Select all orders that are greater than the average for October 4.
+
+select * from orders 
+where amt >(select avg(amt) from orders where odate='1996-10-04');
+
+
+
+38. Write a select command using a corelated subquery that selects the names and numbers of all customers with ratings equal to the maximum for their city.
+
+select cname , cnum,c1.city from customers c1 where rating =(select max(rating) from customers c2 where c1.city = c2.city);
+
+mysql> select cname , cnum,c1.city from customers c1 where rating =(select max(rating) from customers c2 where c1.city = c2.city);
++----------+------+----------+
+| cname    | cnum | city     |
++----------+------+----------+
+| Hoffman  | 2001 | London   |
+| Giovanni | 2002 | Rome     |
+| Grass    | 2004 | Berlin   |
+| Clemens  | 2006 | London   |
+| Cisneros | 2008 | San Jose |
++----------+------+----------+
+5 rows in set (0.80 sec)
+
+39. Write a query that totals the orders for each day and places the results in descending order.
+
+select odate,sum(amt) as total_for_day from orders
+group by odate
+order by total_for_day desc;
+
+mysql> select odate,sum(amt) as total_for_day from orders
+    -> group by odate
+    -> order by total_for_day desc;
++------------+---------------+
+| odate      | total_for_day |
++------------+---------------+
+| 1996-06-10 |      11201.83 |
+| 1996-03-10 |       8944.59 |
+| 1996-05-10 |       4723.00 |
+| 1996-04-10 |       1788.98 |
++------------+---------------+
+
+40. Write a select command that produces the rating followed by the name of each customer in San Jose.
+
+select rating, cname from customers where city='San Jose';
+
+mysql> select rating, cname from customers where city='San Jose';
++--------+----------+
+| rating | cname    |
++--------+----------+
+|    200 | Liu      |
+|    300 | Cisneros |
++--------+----------+
+2 rows in set (0.01 sec)
+
+
 
