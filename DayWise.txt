@@ -846,4 +846,147 @@ mysql> select rating, cname from customers where city='San Jose';
 2 rows in set (0.01 sec)
 
 
+17-04-26
+
+41. Find all orders with amounts smaller than any amount for a customer in San Jose.
+
+san jose vale customer se less amt vala order kisi ka nahi hai so empty set
+
+select * 
+from orders o
+where amt < all(
+select amt 
+from orders o2
+join customers c2 on o2.snum = c2.snum
+where c2.city='San Jose'
+);
+
+mysql> select *
+    -> from orders o
+    -> where amt < all(
+    -> select amt
+    -> from orders o2
+    -> join customers c2 on o2.snum = c2.snum
+    -> where c2.city='San Jose'
+    -> );
+Empty set (0.01 sec)
+ 
+
+42. Find all orders with above average amounts for their customers.
+
+select * from orders o
+where amt > (select avg(o2.amt)from orders o2
+where o2.cnum=o.cnum);
+
+mysql> select * from orders o
+    -> where amt > (select avg(o2.amt)from orders o2
+    -> where o2.cnum=o.cnum);
++------+---------+------------+------+------+
+| ONUM | AMT     | ODATE      | CNUM | SNUM |
++------+---------+------------+------+------+
+| 3006 | 1098.16 | 1996-03-10 | 2008 | 1007 |
+| 3009 | 1713.23 | 1996-04-10 | 2002 | 1003 |
+| 3011 | 9891.88 | 1996-06-10 | 2006 | 1001 |
++------+---------+------------+------+------+
+3 rows in set (0.36 sec)av
+
+43. Write a query that selects the highest rating in each city.
+
+select city, max(rating) as max_rating 
+from customers 
+group by city;
+
+mysql> select city, max(rating) as max_rating
+    -> from customers
+    -> group by city;
++----------+------------+
+| city     | max_rating |
++----------+------------+
+| London   |        100 |
+| Rome     |        200 |
+| San Jose |        300 |
+| Berlin   |        300 |
+| NULL     |        200 |
++----------+------------+
+5 rows in set (0.00 sec)
+
+
+SELECT c.cname, c.city, c.rating
+FROM customers c
+WHERE c.rating = (
+    SELECT MAX(c2.rating)
+    FROM customers c2
+    WHERE c2.city = c.city
+);
+
+mysql> SELECT c.cname, c.city, c.rating
+    -> FROM customers c
+    -> WHERE c.rating = (
+    ->     SELECT MAX(c2.rating)
+    ->     FROM customers c2
+    ->     WHERE c2.city = c.city
+    -> );
++----------+----------+--------+
+| cname    | city     | rating |
++----------+----------+--------+
+| Hoffman  | London   |    100 |
+| Giovanni | Rome     |    200 |
+| Grass    | Berlin   |    300 |
+| Clemens  | London   |    100 |
+| Cisneros | San Jose |    300 |
++----------+----------+--------+
+5 rows in set (0.01 sec)
+
+
+44. Write a query that calculates the amount of the salesperson’s commission on each order by a customer with a rating above 100.00.
+
+
+select o.onum,s.sname,o.amt,s.comm, (s.comm * o.amt) comm_inrs 
+from orders o
+join salespeople s
+on o.snum=s.snum
+join customers c on o.cnum=c.cnum 
+where c.rating>100;
+
+mysql> select o.onum,s.sname,o.amt,s.comm, (s.comm * o.amt) comm_inrs
+    -> from orders o
+    -> join salespeople s
+    -> on o.snum=s.snum
+    -> join customers c on o.cnum=c.cnum
+    -> where c.rating>100;
++------+---------+---------+------+-----------+
+| onum | sname   | amt     | comm | comm_inrs |
++------+---------+---------+------+-----------+
+| 3007 | AxelRod |   75.75 | 0.11 |    8.3325 |
+| 3009 | AxelRod | 1713.23 | 0.11 |  188.4553 |
+| 3005 | Serres  | 5160.45 | 0.13 |  670.8585 |
+| 3010 | Serres  | 1309.95 | 0.13 |  170.2935 |
+| 3001 | Rifkin  |   18.69 | 0.26 |    4.8594 |
+| 3006 | Rifkin  | 1098.16 | 0.26 |  285.5216 |
++------+---------+---------+------+-----------+
+6 rows in set (0.00 sec)
+
+select o.onum,s.sname,o.amt,s.comm, (s.comm * o.amt) comm_inrs 
+from salespeople s 
+join orders o
+on s.snum=o.snum
+join customers c on s.snum=c.snum 
+where c.rating>100;
+
+45. Count the customers with ratings above San Jose’s average.
+
+select * from customers where rating > ( select avg(rating) from customers where city = 'San Jose');
+
+mysql> select * from customers where rating > ( select avg(rating) from customers where city = 'San Jose');
++------+----------+----------+--------+------+
+| CNUM | CNAME    | CITY     | RATING | SNUM |
++------+----------+----------+--------+------+
+| 2004 | Grass    | Berlin   |    300 | 1002 |
+| 2008 | Cisneros | San Jose |    300 | 1007 |
++------+----------+----------+--------+------+
+2 rows in set (0.16 sec)
+
+
+
+
 
