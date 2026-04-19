@@ -987,6 +987,163 @@ mysql> select * from customers where rating > ( select avg(rating) from customer
 2 rows in set (0.16 sec)
 
 
+18-04-26
+
+46. Write a query that produces all pairs of salespeople with themselves as well as duplicate rows with the order reversed.
+
+select s1.sname as salesperson1 ,s2.sname as salesperson2 
+from salespeople s1
+cross join salespeople s2
+order by salesperson1 desc, salesperson2 desc;
+
+mysql> select s1.sname as salesperson1 ,s2.sname as salesperson2
+    -> from salespeople s1
+    -> cross join salespeople s2
+    -> order by salesperson1 desc, salesperson2 desc;
++--------------+--------------+
+| salesperson1 | salesperson2 |
++--------------+--------------+
+| Serres       | Serres       |
+| Serres       | Rifkin       |
+| Serres       | Peel         |
+| Serres       | Motika       |
+| Serres       | Fran         |
+| Serres       | AxelRod      |
+| Rifkin       | Serres       |
+| Rifkin       | Rifkin       |
+| Rifkin       | Peel         |
+| Rifkin       | Motika       |
+| Rifkin       | Fran         |
+| Rifkin       | AxelRod      |
+| Peel         | Serres       |
+| Peel         | Rifkin       |
+| Peel         | Peel         |
+| Peel         | Motika       |
+| Peel         | Fran         |
+| Peel         | AxelRod      |
+| Motika       | Serres       |
+| Motika       | Rifkin       |
+| Motika       | Peel         |
+| Motika       | Motika       |
+| Motika       | Fran         |
+| Motika       | AxelRod      |
+| Fran         | Serres       |
+| Fran         | Rifkin       |
+| Fran         | Peel         |
+| Fran         | Motika       |
+| Fran         | Fran         |
+| Fran         | AxelRod      |
+| AxelRod      | Serres       |
+| AxelRod      | Rifkin       |
+| AxelRod      | Peel         |
+| AxelRod      | Motika       |
+| AxelRod      | Fran         |
+| AxelRod      | AxelRod      |
++--------------+--------------+
+36 rows in set (0.01 sec) 
+
+
+47. Find all salespeople that are located in either "Barcelona" or "London".
+
+select * from salespeople where city= "Barcelona" or city="London";
+
+mysql> select * from salespeople where city= "Barcelona" or city="London";
++------+--------+-----------+------+
+| SNUM | SNAME  | CITY      | COMM |
++------+--------+-----------+------+
+| 1001 | Peel   | London    | 0.12 |
+| 1004 | Motika | London    | 0.15 |
+| 1005 | Fran   | London    | 0.10 |
+| 1007 | Rifkin | Barcelona | 0.26 |
++------+--------+-----------+------+
+4 rows in set (0.01 sec)
+
+select * from salespeople where city IN( "Barcelona" ,"London");
+
+mysql> select * from salespeople where city IN( "Barcelona" ,"London");
++------+--------+-----------+------+
+| SNUM | SNAME  | CITY      | COMM |
++------+--------+-----------+------+
+| 1001 | Peel   | London    | 0.12 |
+| 1004 | Motika | London    | 0.15 |
+| 1005 | Fran   | London    | 0.10 |
+| 1007 | Rifkin | Barcelona | 0.26 |
++------+--------+-----------+------+
+4 rows in set (0.01 sec)
+
+
+48. Find all salespeople with only one customer.
+
+select s.snum, s.sname 
+from salespeople s
+join customers c on s.snum=c.snum
+group by s.snum, s.sname
+having count(c.cnum) = 1;
+
+mysql> select s.snum, s.sname
+    -> from salespeople s
+    -> join customers c on s.snum=c.snum
+    -> group by s.snum, s.sname
+    -> having count(c.cnum) = 1;
++------+---------+
+| snum | sname   |
++------+---------+
+| 1003 | AxelRod |
+| 1007 | Rifkin  |
++------+---------+
+2 rows in set (0.00 sec)
+
+49. Write a query that joins the Customer table to itself to find all pairs of customers served by a single salesperson.
+
+select 
+c1.cnum as customer1,
+c1.cname as name, 
+c2.cnum as customer2,
+c2.cname as customer2,
+c1.snum
+from customers c1 join customers c2
+on c1.snum = c2.snum
+and c1.cnum < c2.cnum;
+
+mysql> select
+    -> c1.cnum as customer1,
+    -> c1.cname as name,
+    -> c2.cnum as customer2,
+    -> c2.cname as customer2,
+    -> c1.snum
+    -> from customers c1 join customers c2
+    -> on c1.snum = c2.snum
+    -> and c1.cnum < c2.cnum;
++-----------+---------+-----------+-----------+------+
+| customer1 | name    | customer2 | customer2 | snum |
++-----------+---------+-----------+-----------+------+
+|      2001 | Hoffman |      2006 | Clemens   | 1001 |
+|      2003 | Liu     |      2004 | Grass     | 1002 |
+|      2007 | Pereira |      2010 | Andy      | 1004 |
++-----------+---------+-----------+-----------+------+
+3 rows in set (0.00 sec)
+
+
+50. Write a query that will give you all orders for more than $1000.00
+
+select * from orders where amt > 1000;
+
+
+mysql> select * from orders where amt > 1000;
++------+---------+------------+------+------+
+| ONUM | AMT     | ODATE      | CNUM | SNUM |
++------+---------+------------+------+------+
+| 3002 | 1900.10 | 1996-03-10 | 2007 | 1004 |
+| 3005 | 5160.45 | 1996-03-10 | 2003 | 1002 |
+| 3006 | 1098.16 | 1996-03-10 | 2008 | 1007 |
+| 3008 | 4723.00 | 1996-05-10 | 2006 | 1001 |
+| 3009 | 1713.23 | 1996-04-10 | 2002 | 1003 |
+| 3010 | 1309.95 | 1996-06-10 | 2004 | 1002 |
+| 3011 | 9891.88 | 1996-06-10 | 2006 | 1001 |
++------+---------+------------+------+------+
+7 rows in set (0.02 sec)
+
+
 
 
 
