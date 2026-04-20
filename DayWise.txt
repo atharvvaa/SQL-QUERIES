@@ -1145,5 +1145,151 @@ mysql> select * from orders where amt > 1000;
 
 
 
+20-04-26
+
+
+51. Write a query that lists each order number followed by the name of the customer who made
+that order.
+
+select o.onum, c.cname
+from orders o
+join customers c
+on o.cnum=c.cnum;
+
+mysql> select o.onum, c.cname
+    -> from orders o
+    -> join customers c
+    -> on o.cnum=c.cnum;
++------+----------+
+| onum | cname    |
++------+----------+
+| 3003 | Hoffman  |
+| 3007 | Giovanni |
+| 3009 | Giovanni |
+| 3005 | Liu      |
+| 3010 | Grass    |
+| 3008 | Clemens  |
+| 3011 | Clemens  |
+| 3002 | Pereira  |
+| 3001 | Cisneros |
+| 3006 | Cisneros |
++------+----------+
+10 rows in set (0.01 sec)
+
+
+52. Write 2 queries that select all salespeople (by name and number) who have customers in their cities who they do not service, one using a join and one a corelated subquery. Which solution is more elegant?
+
+select distinct s.sname, s.snum  
+from salespeople s join customers c
+on s.city = c.city
+where s.snum <> c.snum;
+
+mysql> select distinct s.sname, s.snum
+    -> from salespeople s join customers c
+    -> on s.city = c.city
+    -> where s.snum <> c.snum;
++--------+------+
+| sname  | snum |
++--------+------+
+| Fran   | 1005 |
+| Motika | 1004 |
+| Serres | 1002 |
++--------+------+
+3 rows in set (0.02 sec)
+
+
+53. Write a query that selects all customers whose ratings are equal to or greater than ANY (in the SQL sense) of Serres’?
+
+select * from 
+customers
+where rating >any(
+select comm *1000
+from salespeople 
+where sname="Serres"
+);
+
+mysql> select * from
+    -> customers
+    -> where rating >=any(
+    -> select comm *1000
+    -> from salespeople
+    -> where sname="Serres"
+    -> );
++------+----------+----------+--------+------+
+| CNUM | CNAME    | CITY     | RATING | SNUM |
++------+----------+----------+--------+------+
+| 2002 | Giovanni | Rome     |    200 | 1003 |
+| 2003 | Liu      | San Jose |    200 | 1002 |
+| 2004 | Grass    | Berlin   |    300 | 1002 |
+| 2008 | Cisneros | San Jose |    300 | 1007 |
+| 2009 | Robert   | Rome     |    400 | 1001 |
+| 2010 | Andy     | NULL     |    200 | 1004 |
++------+----------+----------+--------+------+
+6 rows in set (0.00 sec)
+
+54. Write 2 queries that will produce all orders taken on October 3 or October 4.
+
+select * from orders 
+where odate IN("1996-03-10","1996-04-10");
+
+mysql> select * from orders
+    -> where odate IN("1996-03-10","1996-04-10");
++------+---------+------------+------+------+
+| ONUM | AMT     | ODATE      | CNUM | SNUM |
++------+---------+------------+------+------+
+| 3001 |   18.69 | 1996-03-10 | 2008 | 1007 |
+| 3002 | 1900.10 | 1996-03-10 | 2007 | 1004 |
+| 3003 |  767.19 | 1996-03-10 | 2001 | 1001 |
+| 3005 | 5160.45 | 1996-03-10 | 2003 | 1002 |
+| 3006 | 1098.16 | 1996-03-10 | 2008 | 1007 |
+| 3007 |   75.75 | 1996-04-10 | 2002 | 1003 |
+| 3009 | 1713.23 | 1996-04-10 | 2002 | 1003 |
++------+---------+------------+------+------+
+7 rows in set (0.01 sec)
+
+select * from orders 
+where odate="1996-03-10" or odate="1996-04-10";
+
+mysql> select * from orders
+    -> where odate="1996-03-10" or odate="1996-04-10";
++------+---------+------------+------+------+
+| ONUM | AMT     | ODATE      | CNUM | SNUM |
++------+---------+------------+------+------+
+| 3001 |   18.69 | 1996-03-10 | 2008 | 1007 |
+| 3002 | 1900.10 | 1996-03-10 | 2007 | 1004 |
+| 3003 |  767.19 | 1996-03-10 | 2001 | 1001 |
+| 3005 | 5160.45 | 1996-03-10 | 2003 | 1002 |
+| 3006 | 1098.16 | 1996-03-10 | 2008 | 1007 |
+| 3007 |   75.75 | 1996-04-10 | 2002 | 1003 |
+| 3009 | 1713.23 | 1996-04-10 | 2002 | 1003 |
++------+---------+------------+------+------+
+7 rows in set (0.00 sec)
+
+55. Write a query that produces all pairs of orders by a given customer. Name that customer and eliminate duplicates.
+
+select c.cname, o1.onum as order1, o2.onum as order2 
+from customers c 
+join orders o1 on c.cnum=o1.cnum
+join orders o2 on c.cnum=o2.cnum
+where c.cname='Clemens'
+and o1.onum<o2.onum;
+
+
+mysql> select c.cname, o1.onum as order1, o2.onum as order2
+    -> from customers c
+    -> join orders o1 on c.cnum=o1.cnum
+    -> join orders o2 on c.cnum=o2.cnum
+    -> where c.cname='Clemens'
+    -> and o1.onum<o2.onum;
++---------+--------+--------+
+| cname   | order1 | order2 |
++---------+--------+--------+
+| Clemens |   3008 |   3011 |
++---------+--------+--------+
+1 row in set (0.00 sec)
+
+
+
+
 
 
