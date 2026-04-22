@@ -1290,6 +1290,87 @@ mysql> select c.cname, o1.onum as order1, o2.onum as order2
 
 
 
+22-04-26
+
+56. Find only those customers whose ratings are higher than every customer in Rome.
+
+select * from customers where rating > all(select rating from customers where city="Rome");
+
+
+57. Write a query on the Customers table whose output will exclude all customers with a rating <= 100.00, unless they are located in Rome.
+
+select * from customers where rating > 100 or city='Rome';
+
+mysql> select * from customers where rating > 100 or city='Rome';
++------+----------+----------+--------+------+
+| CNUM | CNAME    | CITY     | RATING | SNUM |
++------+----------+----------+--------+------+
+| 2002 | Giovanni | Rome     |    200 | 1003 |
+| 2003 | Liu      | San Jose |    200 | 1002 |
+| 2004 | Grass    | Berlin   |    300 | 1002 |
+| 2007 | Pereira  | Rome     |    100 | 1004 |
+| 2008 | Cisneros | San Jose |    300 | 1007 |
+| 2009 | Robert   | Rome     |    400 | 1001 |
+| 2010 | Andy     | NULL     |    200 | 1004 |
++------+----------+----------+--------+------+
+7 rows in set (0.00 sec)
+
+58. Find all rows from the Customers table for which the salesperson number is 1001.
+
+select * from customers where snum=1001;
+
+mysql> select * from customers where snum=1001;
++------+---------+--------+--------+------+
+| CNUM | CNAME   | CITY   | RATING | SNUM |
++------+---------+--------+--------+------+
+| 2001 | Hoffman | London |    100 | 1001 |
+| 2006 | Clemens | London |    100 | 1001 |
+| 2009 | Robert  | Rome   |    400 | 1001 |
++------+---------+--------+--------+------+
+3 rows in set (0.01 sec)
+
+59. Find the total amount in Orders for each salesperson for whom this total is greater than the amount of the largest order in the table.
+
+select s.snum,s.sname, sum(o.amt) as total_amount 
+from salespeople s join orders o 
+on s.snum=o.snum
+group by s.snum, s.sname
+having sum(o.amt)> (select max(amt) from orders);
+
+mysql> select s.snum,s.sname, sum(o.amt) as total_amount
+    -> from salespeople s join orders o
+    -> on s.snum=o.snum
+    -> group by s.snum, s.sname
+    -> having sum(o.amt)> (select max(amt) from orders);
++------+-------+--------------+
+| snum | sname | total_amount |
++------+-------+--------------+
+| 1001 | Peel  |     15382.07 |
++------+-------+--------------+
+1 row in set (0.06 sec)
+
+60.Write a query that selects all orders save those with zeroes or NULLs in the amount field.
+
+select * from orders where amt is not null and amt <> 0;
+
+mysql> select * from orders where amt is not null and amt <> 0;
++------+---------+------------+------+------+
+| ONUM | AMT     | ODATE      | CNUM | SNUM |
++------+---------+------------+------+------+
+| 3001 |   18.69 | 1996-03-10 | 2008 | 1007 |
+| 3002 | 1900.10 | 1996-03-10 | 2007 | 1004 |
+| 3003 |  767.19 | 1996-03-10 | 2001 | 1001 |
+| 3005 | 5160.45 | 1996-03-10 | 2003 | 1002 |
+| 3006 | 1098.16 | 1996-03-10 | 2008 | 1007 |
+| 3007 |   75.75 | 1996-04-10 | 2002 | 1003 |
+| 3008 | 4723.00 | 1996-05-10 | 2006 | 1001 |
+| 3009 | 1713.23 | 1996-04-10 | 2002 | 1003 |
+| 3010 | 1309.95 | 1996-06-10 | 2004 | 1002 |
+| 3011 | 9891.88 | 1996-06-10 | 2006 | 1001 |
++------+---------+------------+------+------+
+10 rows in set (0.01 sec)
+
+
 
 
 
