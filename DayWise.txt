@@ -1371,6 +1371,150 @@ mysql> select * from orders where amt is not null and amt <> 0;
 10 rows in set (0.01 sec)
 
 
+24-04-26
+
+61. Produce all combinations of salespeople and customer names such that the former precedes the latter alphabetically, and the latter has a rating of less than 200.
+
+select s.sname, c.cname, c.rating
+from salespeople s cross join customers c 
+where s.sname < c.cname and c.rating < 200
+order by s.sname, c.cname;
+
+mysql> select s.sname, c.cname, c.rating
+    -> from salespeople s cross join customers c
+    -> where s.sname < c.cname and c.rating < 200
+    -> order by s.sname, c.cname;
++---------+---------+--------+
+| sname   | cname   | rating |
++---------+---------+--------+
+| AxelRod | Clemens |    100 |
+| AxelRod | Hoffman |    100 |
+| AxelRod | Pereira |    100 |
+| Fran    | Hoffman |    100 |
+| Fran    | Pereira |    100 |
+| Motika  | Pereira |    100 |
+| Peel    | Pereira |    100 |
++---------+---------+--------+
+7 rows in set (0.00 sec)
+
+
+62. List all Salespeople’s names and the Commission they have earned.
+
+mysql> select s.sname, s.comm, (o.amt * s.comm) commission_earned
+    -> from salespeople s join orders o
+    -> on s.snum = o.snum;
++---------+------+-------------------+
+| sname   | comm | commission_earned |
++---------+------+-------------------+
+| Rifkin  | 0.26 |            4.8594 |
+| Motika  | 0.15 |          285.0150 |
+| Peel    | 0.12 |           92.0628 |
+| Serres  | 0.13 |          670.8585 |
+| Rifkin  | 0.26 |          285.5216 |
+| AxelRod | 0.11 |            8.3325 |
+| Peel    | 0.12 |          566.7600 |
+| AxelRod | 0.11 |          188.4553 |
+| Serres  | 0.13 |          170.2935 |
+| Peel    | 0.12 |         1187.0256 |
++---------+------+-------------------+
+10 rows in set (0.10 sec)
+
+
+select s.sname, s.comm, sum(o.amt * s.comm) commission_earned
+from salespeople s join orders o 
+on s.snum = o.snum
+group by s.sname, s.comm;
+
+mysql> select s.sname, s.comm, sum(o.amt * s.comm) commission_earned
+    -> from salespeople s join orders o
+    -> on s.snum = o.snum
+    -> group by s.sname, s.comm;
++---------+------+-------------------+
+| sname   | comm | commission_earned |
++---------+------+-------------------+
+| Rifkin  | 0.26 |          290.3810 |
+| Motika  | 0.15 |          285.0150 |
+| Peel    | 0.12 |         1845.8484 |
+| Serres  | 0.13 |          841.1520 |
+| AxelRod | 0.11 |          196.7878 |
++---------+------+-------------------+
+5 rows in set (0.00 sec)
+
+63. Write a query that produces the names and cities of all customers with the same rating as Hoffman. 
+
+select cname,city from customers where rating =(select rating from customers where cname='Hoffman');
+
+mysql> select cname,city from customers where rating =(select rating from customers where cname='Hoffman');
++---------+--------+
+| cname   | city   |
++---------+--------+
+| Hoffman | London |
+| Clemens | London |
+| Pereira | Rome   |
++---------+--------+
+3 rows in set (0.02 sec)
+
+Write the query using Hoffman’s CNUM rather than his rating, so that it would still be usable if his rating changed.
+
+select cname,city from customers where rating =(select rating from customers where cnum=2001);
+
+mysql> select cname,city from customers where rating =(select rating from customers where cnum=2001);
++---------+--------+
+| cname   | city   |
++---------+--------+
+| Hoffman | London |
+| Clemens | London |
+| Pereira | Rome   |
++---------+--------+
+3 rows in set (0.00 sec)
+
+
+64. Find all salespeople for whom there are customers that follow them in alphabetical order.
+
+select s.sname, c.cname 
+from salespeople s join customers c 
+on s.snum=c.snum
+where c.cname >= s.sname;
+
+mysql> select s.sname, c.cname
+    -> from salespeople s join customers c
+    -> on s.snum=c.snum
+    -> where c.cname >= s.sname;
++---------+----------+
+| sname   | cname    |
++---------+----------+
+| AxelRod | Giovanni |
+| Motika  | Pereira  |
+| Peel    | Robert   |
++---------+----------+
+3 rows in set (0.00 sec)
+
+
+65. Write a query that produces the names and ratings of all customers of all who have above average orders.
+
+select c.cname, c.rating
+from customers c join orders o 
+on c.cnum=o.cnum
+where o.amt > (
+ select avg(amt) from orders
+);
+
+mysql> select c.cname, c.rating
+    -> from customers c join orders o
+    -> on c.cnum=o.cnum
+    -> where o.amt > (
+    ->  select avg(amt) from orders
+    -> );
++---------+--------+
+| cname   | rating |
++---------+--------+
+| Liu     |    200 |
+| Clemens |    100 |
+| Clemens |    100 |
++---------+--------+
+3 rows in set (0.00 sec)
+
+
 
 
 
